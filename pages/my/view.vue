@@ -8,34 +8,30 @@
 			<view class="p-3 bg-white rounded-lg mb-3">
 				<view class="font-semibold text-xl">登录信息</view>
         <view v-for="item of userInfoList" :key="item.remoteIndex">
-          <view class="text-sm text-gray-400 flex items-center my-1">
-            <span style="padding-right: 1rem">配置{{item.remoteIndex + 1}}</span>
-          </view>
-          <view class="text-sm text-gray-400 flex items-center my-1">
-            <span style="padding-right: 1rem">用户名</span>
-            <span>
-						{{ item.username }}
-					</span>
-          </view>
-          <view class="text-sm text-gray-400 flex items-center my-1">
-            <span class="pr-1">用户等级</span>
-            <span>
-						{{ item.name }}
-					</span>
-          </view>
           <view class="text-sm text-gray-400 flex items-center">
             <span class="pr-1">远程地址</span>
             <span>
-						{{ item.url }}
-					</span>
+						  {{ item.url }}
+					  </span>
+          </view>
+          
+          <view v-if="item.wifiNames && item.wifiDomain" class="text-sm text-gray-400 flex items-center my-1">
+            <span style="padding-right: 1rem">指定WIFI</span>
+            <span>
+						  {{ item.wifiNames }}
+					  </span>
+          </view>
+          <view v-if="item.wifiNames && item.wifiDomain" class="text-sm text-gray-400 flex items-center my-1">
+            <span class="pr-1">指定地址</span>
+            <span>
+						  {{ item.wifiDomain }}
+					  </span>
           </view>
           <view class="text-sm text-gray-400 flex items-center">
-            <span class="pr-1">NVR版本 {{ item.serverVersion }}</span>
+            <span class="pr-1">服务器版本 {{ item.serverVersion }}</span>
           </view>
+          <view class="h-5"></view>
         </view>
-				
-
-				<view class="h-5"></view>
 
 				<view class="font-semibold text-xl">版本信息</view>
 				<view class="text-sm text-gray-400 flex items-center my-1">
@@ -75,22 +71,19 @@ onMounted(() => {
 	const info = uni.getAppBaseInfo();
 	version.value = info.appWgtVersion;
 	findUserInfo();
-	findVersion();
 });
 
 // 获取用户信息
-const findUserInfo = () => {
-  userInfoList.value = GetUserInfo();
-};
-
-// 获取服务端版本
-const findVersion = async () => {
-  for(const item of userInfoList.value) {
+const findUserInfo = async () => {
+  const list = GetUserInfo();
+  
+  for(const item of list) {
     const res = await FindVersion(item.remoteIndex).catch((err) => {
       console.log('>>请求错误>>', err);
     });
     item.serverVersion = res.version;
   }
+  userInfoList.value = list
 };
 
 const handeLogout = () => {

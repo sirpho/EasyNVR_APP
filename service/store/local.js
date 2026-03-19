@@ -1,4 +1,5 @@
 // utils/storage.js
+import {useGlobal} from "./global";
 
 /**
  * @description 获取本地存储数据（同步）
@@ -142,7 +143,14 @@ export const ClearUserInfo = () => {
  * @returns {string} 远程 url 地址
  */
 export const GetRemoteUrl = (index) => {
-	return (GetLoginInfo() || [])[index]?.url || '';
+	const globalState = useGlobal()
+
+	const option = (GetLoginInfo() || [])[index] || {}
+	let field = "url";
+	if(globalState.wifiName && option.wifiNames && option.wifiNames.includes(globalState.wifiName)) {
+		field = "wifiUrl"
+	}
+	return option[field] || '';
 }
 
 

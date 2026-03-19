@@ -4,6 +4,8 @@ import {
 	ClearToken,
 	GetRemoteUrl
 } from '../store/local';
+import {getWifiName, isWifiNetwork} from "./wifi";
+import { useGlobal } from "../store/global";
 
 const codeMessage = {
 	200: '服务器成功返回请求的数据。',
@@ -18,7 +20,15 @@ const codeMessage = {
 const neglectUrl = ['/configs/info/web', '/stats']; // 需要忽略错误处理的 URL
 
 // 统一请求封装
-const request = (url, method = 'GET', data = {}, options = {}) => {
+const request = async (url, method = 'GET', data = {}, options = {}) => {
+	const isWifi = await isWifiNetwork()
+	const globalState = useGlobal()
+	if(isWifi) {
+		const wifiName = await getWifiName()
+		globalState.setWifiName(wifiName)
+	} else {
+		globalState.setWifiName('')
+	}
 	return new Promise((resolve, reject) => {
 		const remoteIndex = parseInt(options?.remoteIndex || 0)
 		uni.request({

@@ -1,9 +1,10 @@
 <template>
-	<view class="page-content">
+	<view class="page-content pt-24">
 		<!-- 顶部logo区域 -->
 		<view class="logo-wrap">
 			<image class="logo-img" src="/static/image/logo.png"></image>
-		</view>
+      <view class="text-xl pt-2">MultiNVR</view>
+    </view>
 
 		<!-- swiper滑动容器 -->
 		<swiper class="form-swiper" :current="currentFormIndex" @change="onSwiperChange"
@@ -21,6 +22,12 @@
 					<view class="form-item">
 						<FocusInput v-model="form.password" placeholder="密码" type="password" />
 					</view>
+          <view class="form-item">
+            <FocusInput v-model="form.wifiNames" placeholder="指定WIFI,有多个则逗号分隔" />
+          </view>
+          <view class="form-item">
+            <FocusInput v-model="form.wifiDomain" placeholder="连接到指定WIFi时使用该地址" />
+          </view>
 					<view v-if="formList.length > 1" class="form-item del-button-wrapper">
 						<button class="del-button" @click="deleteForm(index)">
 							删除
@@ -54,12 +61,8 @@
 		onMounted
 	} from 'vue';
 	import FocusInput from '@/components/ui/input_focuse.vue';
-	import {
-		onShareAppMessage
-	} from '@dcloudio/uni-app';
-	import {
-		Login
-	} from '@/service/http/login.js';
+	import { onShareAppMessage } from '@dcloudio/uni-app';
+	import { Login } from '@/service/http/login.js';
 	import {
 		GetToken,
 		SetToken,
@@ -68,11 +71,12 @@
 		GetLoginInfo,
 	} from '../../service/store/local';
 
-	// 多表单列表（替代原单个formData）
 	const formList = ref([{
 		domain: '',
 		username: '',
 		password: '',
+    wifiNames: '',
+    wifiDomain: '',
 	}]);
 	// 当前激活的表单索引
 	const currentFormIndex = ref(0);
@@ -183,6 +187,9 @@
       domain: item.domain,
       username: item.username,
       password: item.password,
+      wifiNames: item.wifiNames,
+      wifiDomain: item.wifiDomain,
+      wifiUrl: getFullUrl(item.wifiDomain),
       remoteIndex: index,
     }))
 
@@ -191,6 +198,7 @@
 		SetLoginInfo(result);
     
     const res = await Promise.all(result.map((item, index) => loginSingle(item, index))).catch((err) => {
+      console.log(err)
       let msg = err.msg || err.errMsg || '登录失败，请检查您的服务地址是否正确';
       uni.showToast({
         title: msg,
@@ -223,7 +231,6 @@
 	.page-content {
 		background-color: #FFFFFF;
 		min-height: 100vh;
-		padding: 0 30rpx;
 		/* 左右留白 */
 		box-sizing: border-box;
 	}
@@ -233,7 +240,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		padding-top: 60rpx;
+    flex-direction: column;
 		/* 顶部间距，控制偏上位置 */
 		padding-bottom: 40rpx;
 	}
@@ -252,22 +259,26 @@
 	.form-card {
 		background-color: #FFFFFF;
 		margin: 0 10rpx;
+    padding: 10rpx 30rpx;
 		position: relative;
 		box-sizing: border-box;
 		box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+    height: 100%;
 	}
 	
 	.form-item.del-button-wrapper {
 		display: flex;
-		justify-content: center;
+		justify-content: flex-end;
 	}
 
 	.del-button {
 		font-size: 24rpx;
-    color: #FFFFFF;
-    background: #e74133;
-    width: 384rpx;
+    color: #ef4444;
+    background: #FFFFFF;
+    width: 284rpx;
     margin: 0 0 24rpx 0;
+    border: 2rpx dashed #ef4444;
 	}
 
 	/* 表单项：间距统一 */

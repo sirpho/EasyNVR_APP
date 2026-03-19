@@ -7,16 +7,15 @@ import {
 export const useGlobalStore = defineStore('global', {
 	state: () => ({
 		isSettings: false, //是否配置了远端地址
-		remoteUrl: '', //远端地址
 		count: 0,
+		wifiName: '',
 	}),
 	actions: {
 		setCount() {
 			this.count++;
 		},
-		setSettings(remoteUrl) {
-			this.isSettings = true;
-			this.remoteUrl = remoteUrl;
+		setWifiName(wifiName) {
+			this.wifiName = wifiName;
 		},
 	},
 	persist: {
@@ -37,6 +36,6 @@ export const useGlobal = () => {
 	return {
 		...stateRefs,
 		setCount: globalStore.setCount,
-		setSettings: globalStore.setSettings,
+		setWifiName: globalStore.setWifiName,
 	}; // 只展开 state，手动添加 action
 };
