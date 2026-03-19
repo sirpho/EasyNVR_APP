@@ -70,9 +70,9 @@
 
 	// 多表单列表（替代原单个formData）
 	const formList = ref([{
-		domain: 'http://nvr1.sirpho.top:10000',
-		username: 'admin',
-		password: 'qwe123123',
+		domain: '',
+		username: '',
+		password: '',
 	}]);
 	// 当前激活的表单索引
 	const currentFormIndex = ref(0);

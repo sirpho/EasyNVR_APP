@@ -40,15 +40,12 @@
 			<text class="text-gray-400 text-sm">
 				厂商： {{ item.ext.manufacturer }}
 			</text>
-			<text class="text-gray-400 text-sm">
-				配置： {{ item.remoteIndex }}
-			</text>
 		</view>
 	</view>
 </template>
 
 <script setup>
-import { defineProps, reactive } from 'vue';
+import { defineProps } from 'vue';
 import Snapshot from '@/components/snapshot/snapshot.vue';
 
 const props = defineProps({

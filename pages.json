@@ -45,7 +45,7 @@
 		{
 			"path": "pages/play/view",
 			"style": {
-				"navigationBarTitleText": "直播"
+				"navigationBarTitleText": "预览"
 			}
 		},
 		{
@@ -69,7 +69,7 @@
 		"iconfontSrc": "static/icon/iconfont.ttf",
 		"list": [{
 				"pagePath": "pages/index/view",
-				"text": "直播",
+				"text": "预览",
 				"iconPath": "/static/image/live.png",
 				"selectedIconPath": "/static/image/live-2.png"
 			},

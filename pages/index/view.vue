@@ -1,61 +1,56 @@
 <template>
 	<view>
 		<view class="bg-white">
-			<Navigation title="直播" />
-			<Search
-				:onSearch="handleSearch"
-				:placeholder="'请输入设备 名称 或 ID'"
-				:onStatus="handleStatus"
-			/>
+			<Navigation title="预览" />
 		</view>
-
-		<scroll-view
-			:style="scrollViewStyle"
-			scroll-y
-			refresher-enabled="true"
-			:refresher-threshold="200"
-			:refresher-triggered="refresherTriggered"
-			@refresherrefresh="onRefresh"
-			@scrolltolower="onScrolltolower"
-		>
-			<!-- 骨架屏加载效果，只在初次加载时显示 -->
-			<wd-skeleton
-				v-if="loading && !refresherTriggered"
-				animation="gradient"
-				theme="paragraph"
-				:rows="5"
-			/>
-
-			<!-- 设备列表 -->
-			<view v-else class="grid grid-cols-2 gap-2 p-3 items-stretch">
-				<DeviceCard
-					v-for="(item, index) in deviceData"
-					:key="item.id"
-					:item="item"
-				/>
-			</view>
-
-			<!-- 加载更多指示 -->
-			<view v-if="loadingMore" class="text-center py-3">加载中...</view>
-			<view v-else class="text-center py-3 text-sm">暂无更多</view>
-		</scroll-view>
+    <scroll-view
+      :style="scrollViewStyle"
+      scroll-y
+      refresher-enabled="true"
+      :refresher-threshold="200"
+      :refresher-triggered="refresherTriggered"
+      @refresherrefresh="onRefresh"
+    >
+      <wd-skeleton
+        v-if="loading"
+        animation="gradient"
+        theme="paragraph"
+        :rows="5"
+      />
+    <view v-else class="grid grid-cols-1 gap-2 p-3 items-stretch">
+      <ChannelCard
+        v-for="item in channelList"
+        :key="item.id + '@' + item.remoteIndex"
+        :item="item"
+        :deviceId="item.deviceId"
+      />
+    </view>
+    </scroll-view>
 	</view>
 </template>
 
 <script setup>
-import { onMounted, ref, reactive, computed } from 'vue';
+import {onMounted, ref, reactive, computed} from 'vue';
 import Navigation from '@/components/navigation/navigation.vue';
-import Search from './components/search.vue';
-import DeviceCard from './components/device.vue';
+import ChannelCard from './components/channel.vue';
 import { FindDeviceList } from '@/service/http/device.js';
-import { GetNavBarHeight } from '@/service/utils/utils.js';
+import { FindChannels } from '@/service/http/channel.js';
 import { GetLoginInfo } from '../../service/store/local';
-const deviceData = ref([]);
-const deviceTotal = ref(0);
-const loading = ref(false); // 初次加载骨架屏状态
-const loadingMore = ref(false); // 加载更多状态
-const hasMoreData = ref(true); // 是否还有更多数据
+import { GetNavBarHeight } from '@/service/utils/utils.js';
 
+// 设备列表
+const deviceList = ref([]);
+// 通道列表
+const channelList = ref([]);
+
+const loading = ref(false); // 初次加载骨架屏状态
+const refresherTriggered = ref(false);
+const titleHeight = ref(0);
+
+// 动态计算 scroll-view 的高度
+const scrollViewStyle = computed(() => {
+  return `height: calc(100vh - ${titleHeight.value}px)`;
+});
 // 分页参数
 const pagination = reactive({
 	page: 1,
@@ -67,105 +62,69 @@ const pagination = reactive({
 	protocol: '',
 });
 
-const titleHeight = ref(0); // 导航栏高度
-const refresherTriggered = ref(false); // 控制下拉刷新状态
-
-// 计算 scroll-view 的高度
-const scrollViewStyle = computed(() => {
-	return `height: calc(100vh - ${titleHeight.value}px);`;
-});
-
 onMounted(() => {
-	getHeight();
+  getHeight();
 	findDeviceList();
 });
-
-// **获取设备列表**
-// isLoadMore: 是否为上拉加载更多；
-// isRefresh: 是否为下拉刷新（不展示骨架屏）
-const findDeviceList = async (isLoadMore = false, isRefresh = false) => {
-	// 非上拉加载，并且不是下拉刷新时，显示骨架屏
-	if (!isLoadMore && !isRefresh) {
-		loading.value = true;
-	}
+// 下拉刷新逻辑
+const onRefresh = async () => {
+  refresherTriggered.value = true;
+  await findDeviceList();
+  // 给刷新动画留出时间
+  await new Promise(resolve => setTimeout(resolve, 500));
+  refresherTriggered.value = false;
+};
+/**
+ * 获取设备列表
+ */
+const findDeviceList = async () => {
+  loading.value = true;
   const loginInfoList = GetLoginInfo()
   const itemList = []
-  let total = 0
-  let hasMore = false
   
   for(const item of loginInfoList) {
-    const res = await FindDeviceList(pagination, item.remoteIndex).catch((err) => {
-      console.log('>>请求错误>>>', err);
-    });
-    total += res.total;
+    const res = await FindDeviceList(pagination, item.remoteIndex);
     const items = res.items.map(ite => ({
       ...ite,
       remoteIndex: item.remoteIndex
     }))
     itemList.push(...items)
-    if(items.length > pagination.size) {
-      hasMore = true
-    }
   }
-
-
-	if (isLoadMore) {
-		// 追加数据
-		deviceData.value = [...deviceData.value, ...itemList];
-	} else {
-		// 初始化数据
-		deviceData.value = itemList;
-		deviceTotal.value = total;
-	}
-  hasMoreData.value = hasMore;
-
-	// 非上拉加载，并且不是下拉刷新时，结束骨架屏加载
-	if (!isLoadMore && !isRefresh) {
-		loading.value = false;
-	}
-	loadingMore.value = false;
+  
+  deviceList.value = itemList;
+  await getChannelList();
 };
 
-// **处理搜索**
-const handleSearch = (searchValue) => {
-	pagination.name = searchValue;
-	pagination.page = 1;
-	hasMoreData.value = true; // 搜索后重置是否有更多数据
-	findDeviceList();
-};
+/**
+ * 查询通道列表
+ */
+const getChannelList = async () => {
+  const channels = []
+  for(const device of deviceList.value) {
+    const res = await FindChannels({
+      page: 1,
+      size: 10,
+      device_id: device.id,
+      pid: 'ROOT',
+      status: '',
+      name: '',
+      bid: '',
+    }, device.remoteIndex)
+    channels.push(...res.items.map(item => ({
+      ...item,
+      remoteIndex: device.remoteIndex,
+      deviceId: device.id,
+      deviceName: device.name,
+    })))
+  }
+  channelList.value = channels;
+  
+  loading.value = false;
+}
 
-// **处理筛选**
-const handleStatus = (value) => {
-	pagination.status = value;
-	pagination.page = 1;
-	hasMoreData.value = true; // 筛选后重置是否有更多数据
-	findDeviceList();
-};
-
-// **上拉加载更多**
-const onScrolltolower = () => {
-	if (!hasMoreData.value || loadingMore.value) return; // 没有更多数据或正在加载时，直接返回
-
-	loadingMore.value = true;
-	pagination.page += 1;
-	findDeviceList(true); // 加载更多数据
-};
-
-// **下拉刷新列表**
-const onRefresh = async () => {
-	// 开启下拉刷新状态，避免显示骨架屏
-	refresherTriggered.value = true;
-	pagination.page = 1;
-	hasMoreData.value = true;
-	await findDeviceList(false, true);
-	// 延迟 1 秒后结束下拉刷新状态
-	await new Promise((resolve) => setTimeout(resolve, 1000));
-	refresherTriggered.value = false;
-};
-
-// **获取导航栏高度**
+// 获取导航栏高度
 const getHeight = () => {
-	const height = GetNavBarHeight();
-	titleHeight.value = height + 100;
+  const height = GetNavBarHeight();
+  titleHeight.value = height + 40;
 };
 </script>
