@@ -1,7 +1,7 @@
 <template>
 	<view class="rounded-lg bg-white overflow-hidden" @tap="handleClick">
 		<view style="aspect-ratio: 16 / 9; position: relative">
-			<Snapshot :id="item.id" :is-device="false" />
+			<Snapshot :id="item.id" :remoteIndex="props.remoteIndex" :is-device="false" />
 			<!-- loading 效果层 -->
 			<view
 				v-if="loading"
@@ -36,6 +36,10 @@ const props = defineProps({
 		type: String,
 		default: '',
 	},
+  remoteIndex: {
+		type: Number,
+		default: 0,
+	},
 });
 
 // loading 状态标志
@@ -47,8 +51,8 @@ const handleClick = async () => {
 	loading.value = true;
 	try {
 		const url = await findUrl();
-		const navUrl = `/pages/play/view?url=${encodeURIComponent(url)}&channelId=${props.item.id}&deviceId=${props.deviceId}`;
-		uni.navigateTo({
+		const navUrl = `/pages/play/view?url=${encodeURIComponent(url)}&channelId=${props.item.id}&deviceId=${props.deviceId}&remoteIndex=${props.remoteIndex}`;
+    uni.navigateTo({
 			url: navUrl,
 		});
 	} catch (error) {
@@ -60,7 +64,7 @@ const handleClick = async () => {
 };
 
 const findUrl = async () => {
-	const res = await Live(props.item.id);
+	const res = await Live(props.item.id, props.remoteIndex);
 	return res.address.http_flv;
 };
 </script>

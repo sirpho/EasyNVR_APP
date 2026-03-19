@@ -213,11 +213,6 @@
   padding-right: 0.25rem !important
 }
 
-.px-3 {
-  padding-left: 0.75rem !important;
-  padding-right: 0.75rem !important
-}
-
 .px-4 {
   padding-left: 1rem !important;
   padding-right: 1rem !important
@@ -226,11 +221,6 @@
 .py-3 {
   padding-top: 0.75rem !important;
   padding-bottom: 0.75rem !important
-}
-
-.py-4 {
-  padding-top: 1rem !important;
-  padding-bottom: 1rem !important
 }
 
 .pb-2 {
@@ -305,11 +295,6 @@
 .text-gray-400 {
   --tw-text-opacity: 1 !important;
   color: rgb(156 163 175 / var(--tw-text-opacity, 1)) !important
-}
-
-.text-gray-500 {
-  --tw-text-opacity: 1 !important;
-  color: rgb(107 114 128 / var(--tw-text-opacity, 1)) !important
 }
 
 .text-green-600 {

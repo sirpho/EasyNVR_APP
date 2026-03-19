@@ -5,7 +5,6 @@
 			<view class="video-container">
 				<video
 					:httpCache="true"
-					:codec="software"
 					:advanced="advanced"
 					:play-strategy="1"
 					:src="processedVideoUrl"
@@ -131,10 +130,8 @@
 <script setup>
 import {
 	reactive,
-	nextTick,
 	computed,
 	onMounted,
-	onBeforeUnmount,
 	ref,
 } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
@@ -152,6 +149,7 @@ const advanced = ref([]);
 const props = reactive({
 	channelId: '',
 	deviceId: '',
+	remoteIndex: 0,
 });
 
 const scrollTop = ref(0);
@@ -163,19 +161,17 @@ const endTime = ref(new Date().setHours(23, 59, 59, 999));
 const videoUrls = ref([]);
 const currentIndex = ref(0);
 const seekTime = ref(0);
-const videoPlayer = ref(null);
-// 时间轴 当前时间显示
-const currentTime = ref('08:00');
 
 // 计算处理后的视频地址
 const processedVideoUrl = computed(() => {
-	return SplicBaseUrlToRemoteUrl(videoUrls.value[currentIndex.value]);
+	return SplicBaseUrlToRemoteUrl(videoUrls.value[currentIndex.value], parseInt(props.remoteIndex));
 });
 
 onLoad((options) => {
 	if (options) {
 		props.channelId = options.channelId;
 		props.deviceId = options.deviceId;
+		props.remoteIndex = parseInt(options.remoteIndex);
 	}
 });
 
@@ -310,7 +306,7 @@ const getRecordDays = async () => {
 		source: 'CLOUD',
 		dates: recordMonth.value,
 	};
-	const res = await FindRecordDates(data);
+	const res = await FindRecordDates(data, props.remoteIndex);
 	const result = [];
 	for (const [key, days] of Object.entries(res)) {
 		for (let i = 0; i < days.length; i++) {
@@ -351,7 +347,7 @@ const getRecordTimeline = async () => {
 		start: startTime.value,
 		end: endTime.value,
 	};
-	const res = await FindRecordTimeLine(data).catch((err) => {
+	const res = await FindRecordTimeLine(data, props.remoteIndex).catch((err) => {
 		console.log('>>请求错误>>', err);
 	});
 	intervalArray.value = calculateSegments(res.items);
@@ -367,7 +363,7 @@ const getRecordList = async () => {
 		ssrc: FindUUID(props.channelId),
 	};
 
-	const res = await FindRecordList(data).catch((err) => {
+	const res = await FindRecordList(data, props.remoteIndex).catch((err) => {
 		console.log('>>请求报错>>', err);
 	});
 	if (res?.items) {

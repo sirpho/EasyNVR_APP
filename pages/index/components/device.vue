@@ -40,6 +40,9 @@
 			<text class="text-gray-400 text-sm">
 				厂商： {{ item.ext.manufacturer }}
 			</text>
+			<text class="text-gray-400 text-sm">
+				配置： {{ item.remoteIndex }}
+			</text>
 		</view>
 	</view>
 </template>
@@ -56,12 +59,12 @@ const props = defineProps({
 
 const handleClick = () => {
 	uni.navigateTo({
-		url: `/pages/channel/view?deviceId=${props.item.id}`,
+		url: `/pages/channel/view?deviceId=${props.item.id}&remoteIndex=${props.item.remoteIndex}`,
 	});
 };
 </script>
 
-<style lang="scss">
+<style>
 .nowrap-text {
 	white-space: nowrap;
 }

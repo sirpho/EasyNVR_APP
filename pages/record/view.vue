@@ -22,9 +22,10 @@
       <!-- 数据列表 -->
       <view v-else class="grid grid-cols-2 gap-2 p-3">
         <RecordItem
-          v-for="item in recrodData"
-          :key="item.bid"
+          v-for="item in recordData"
+          :key="item.channel_id + '@' + item.remoteIndex"
           :item="item"
+          :remote-index="item.remoteIndex"
         />
       </view>
 
@@ -40,9 +41,10 @@ import Navigation from '@/components/navigation/navigation.vue';
 import { FindRecords } from '@/service/http/record.js';
 import RecordItem from './components/record.vue';
 import { GetNavBarHeight } from '@/service/utils/utils.js';
+import { GetLoginInfo } from '../../service/store/local';
 
 // 响应式数据
-const recrodData = ref([]);
+const recordData = ref([]);
 const loading = ref(false);
 const refresherTriggered = ref(false);
 const titleHeight = ref(0);
@@ -55,8 +57,19 @@ const scrollViewStyle = computed(() => {
 // 获取记录列表（一次性全部加载）
 const findRecordList = async () => {
   loading.value = true;
-  const res = await FindRecords();
-  recrodData.value = res.items;
+  
+  const itemList = []
+  const loginInfoList = GetLoginInfo()
+  for(const item of loginInfoList) {
+    const res = await FindRecords(item.remoteIndex);
+    const items = res.items.map(ite => ({
+      ...ite,
+      remoteIndex: item.remoteIndex
+    }))
+    itemList.push(...items)
+  }
+  
+  recordData.value = itemList;
   loading.value = false;
 };
 

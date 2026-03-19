@@ -95,8 +95,8 @@ export const clearStorage = () => {
  * @description 获取 Token
  * @returns {string | null} Token 字符串
  */
-export const GetToken = () => {
-	return getLocalStorage('token');
+export const GetToken = (index) => {
+	return (getLocalStorage('token') || [])[index];
 };
 
 /**
@@ -141,8 +141,8 @@ export const ClearUserInfo = () => {
  * @description 远程 url 地址
  * @returns {string} 远程 url 地址
  */
-export const GetRemoteUrl = () => {
-	return GetLoginInfo().url;
+export const GetRemoteUrl = (index) => {
+	return (GetLoginInfo() || [])[index]?.url || '';
 }
 
 
@@ -161,5 +161,5 @@ export const SetLoginInfo = (data) => {
  * @returns {string} 登录信息
  */
 export const GetLoginInfo = () => {
-	return getLocalStorage('loginInfo');
+	return getLocalStorage('loginInfo') || [];
 }

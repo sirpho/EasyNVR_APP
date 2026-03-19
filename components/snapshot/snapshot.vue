@@ -16,23 +16,16 @@ const props = defineProps({
 		type: Boolean,
 		default: true,
 	},
+  remoteIndex: {
+		type: Number,
+		default: 0,
+	},
 });
 
-const imageData = ref(`${GetRemoteUrl()}/cloud/assets/img/noImg.png`);
-
-//获取通道列表
-const pagination = reactive({
-	page: 1,
-	size: 1,
-	device_id: props.id,
-	pid: 'ROOT',
-	status: '',
-	name: '',
-	bid: '',
-});
+const imageData = ref(`${GetRemoteUrl(props.remoteIndex)}/cloud/assets/img/noImg.png`);
 
 const getSnapshotForChannel = () => {
-	GetChannelSnapshot(props.id).then((res) => {
+	GetChannelSnapshot(props.id, props.remoteIndex).then((res) => {
 		if (res.img) {
 			imageData.value = SplicBase64String(res.img);
 		}

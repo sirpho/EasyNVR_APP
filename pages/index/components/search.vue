@@ -7,7 +7,7 @@
 					@search="search"
 					@clear="clear"
 					@change="change"
-					maxlength="99"
+					:maxlength="99"
 					hide-cancel
 					placeholder-left
 					:placeholder="placeholder"

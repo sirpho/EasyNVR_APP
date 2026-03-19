@@ -125,6 +125,7 @@ const props = defineProps({
 	url: { type: String, default: '' },
 	channelId: { type: String, default: '' },
 	deviceId: { type: String, default: '' },
+	remoteIndex: { type: Number, default: 0 },
 });
 
 // 开启麦克风
@@ -188,7 +189,7 @@ const startPTZControl = (speed, direction) => {
 		direction,
 		channel_id: props.channelId,
 	};
-	ControlDeviceStart(data);
+	ControlDeviceStart(data, props.remoteIndex);
 };
 
 const stopPTZControl = (speed, direction) => {
@@ -198,7 +199,7 @@ const stopPTZControl = (speed, direction) => {
 		direction,
 		channel_id: props.channelId,
 	};
-	ControlDeviceStop(data);
+	ControlDeviceStop(data, props.remoteIndex);
 };
 
 const handleVideoError = (e) => {

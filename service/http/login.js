@@ -5,9 +5,11 @@ import {
 	Sha256,
 } from '@/service/utils/crypto.js'
 
-export async function Login(data) {
+export async function Login(data, index) {
 	return await POST('/login', {
 		...data,
 		password: Sha256(data.password),
+	}, {
+		remoteIndex: index
 	})
 }

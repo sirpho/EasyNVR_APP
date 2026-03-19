@@ -1,7 +1,7 @@
 <template>
 	<view class="rounded-lg bg-white overflow-hidden" @tap="handleClick">
 		<view style="aspect-ratio: 16 / 9">
-			<Snapshot :id="item.channel_id" :is-device="false" />
+			<Snapshot :id="item.channel_id" :remoteIndex="props.remoteIndex" :is-device="false" />
 		</view>
 
 		<view class="p-3 flex justify-between items-center">
@@ -19,18 +19,21 @@
 </template>
 
 <script setup>
-import { defineProps, reactive } from 'vue';
+import { defineProps } from 'vue';
 import Snapshot from '@/components/snapshot/snapshot.vue';
 
 const props = defineProps({
 	item: {
 		type: Object,
 	},
+  remoteIndex: {
+    type: Number,
+  }
 });
 
 const handleClick = () => {
 	uni.navigateTo({
-		url: `/pages/record_paly/view?deviceId=${props.item.device_id}&channelId=${props.item.channel_id}`,
+		url: `/pages/record_paly/view?deviceId=${props.item.device_id}&channelId=${props.item.channel_id}&remoteIndex=${props.remoteIndex}`,
 	});
 };
 </script>

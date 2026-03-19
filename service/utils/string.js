@@ -8,10 +8,10 @@ export function SplicBase64String(data) {
 }
 
 // 替换 播放地址 域名
-export function SplicBaseUrlToRemoteUrl(url) {
+export function SplicBaseUrlToRemoteUrl(url, index) {
 	if (!url) return '';
 
-	const remoteUrl = GetRemoteUrl(); // 比如 "https://example.com"
+	const remoteUrl = GetRemoteUrl(index); // 比如 "https://example.com"
 
 	// 1. 完整 URL，替换域名部分
 	if (/^https?:\/\//i.test(url)) {

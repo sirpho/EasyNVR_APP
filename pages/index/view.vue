@@ -49,7 +49,7 @@ import Search from './components/search.vue';
 import DeviceCard from './components/device.vue';
 import { FindDeviceList } from '@/service/http/device.js';
 import { GetNavBarHeight } from '@/service/utils/utils.js';
-
+import { GetLoginInfo } from '../../service/store/local';
 const deviceData = ref([]);
 const deviceTotal = ref(0);
 const loading = ref(false); // 初次加载骨架屏状态
@@ -59,7 +59,7 @@ const hasMoreData = ref(true); // 是否还有更多数据
 // 分页参数
 const pagination = reactive({
 	page: 1,
-	size: 10,
+	size: 30,
 	id: '',
 	status: '',
 	name: '',
@@ -88,26 +88,36 @@ const findDeviceList = async (isLoadMore = false, isRefresh = false) => {
 	if (!isLoadMore && !isRefresh) {
 		loading.value = true;
 	}
+  const loginInfoList = GetLoginInfo()
+  const itemList = []
+  let total = 0
+  let hasMore = false
+  
+  for(const item of loginInfoList) {
+    const res = await FindDeviceList(pagination, item.remoteIndex).catch((err) => {
+      console.log('>>请求错误>>>', err);
+    });
+    total += res.total;
+    const items = res.items.map(ite => ({
+      ...ite,
+      remoteIndex: item.remoteIndex
+    }))
+    itemList.push(...items)
+    if(items.length > pagination.size) {
+      hasMore = true
+    }
+  }
 
-	const res = await FindDeviceList(pagination).catch((err) => {
-		console.log('>>请求错误>>>', err);
-	});
 
 	if (isLoadMore) {
 		// 追加数据
-		deviceData.value = [...deviceData.value, ...res.items];
+		deviceData.value = [...deviceData.value, ...itemList];
 	} else {
 		// 初始化数据
-		deviceData.value = res.items;
-		deviceTotal.value = res.total;
+		deviceData.value = itemList;
+		deviceTotal.value = total;
 	}
-
-	// 判断是否还有更多数据
-	if (res.items.length < pagination.size) {
-		hasMoreData.value = false;
-	} else {
-		hasMoreData.value = true;
-	}
+  hasMoreData.value = hasMore;
 
 	// 非上拉加载，并且不是下拉刷新时，结束骨架屏加载
 	if (!isLoadMore && !isRefresh) {

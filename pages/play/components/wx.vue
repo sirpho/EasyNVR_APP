@@ -12,13 +12,14 @@ const props = defineProps({
 	url: { type: String, default: '' },
 	channelId: { type: String, default: '' },
 	deviceId: { type: String, default: '' },
+	remoteIndex: { type:Number, default: 0 },
 });
 
 // 计算最终的播放 URL
 const finalPlaybackUrl = computed(() => {
 	return `${DEFAULT_LIVE_PLAY_URL}?live_url=${props.url}&channelId=${
 		props.channelId
-	}&deviceId=${props.deviceId}&token=${GetToken()}&baseUrl=${GetRemoteUrl()}`;
+	}&deviceId=${props.deviceId}&token=${GetToken()}&baseUrl=${GetRemoteUrl(props.remoteIndex)}`;
 });
 
 watch(

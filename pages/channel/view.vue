@@ -24,6 +24,7 @@
 					:key="item.id"
 					:item="item"
 					:deviceId="pagination.device_id"
+					:remoteIndex="remoteIndex"
 				/>
 			</view>
 
@@ -52,7 +53,12 @@ onLoad((options) => {
 	if (options?.deviceId) {
 		pagination.device_id = options.deviceId;
 	}
+	if (options?.remoteIndex) {
+    remoteIndex.value = parseInt(options.remoteIndex);
+	}
 });
+
+const remoteIndex = ref(0)
 
 // 分页参数
 const pagination = reactive({
@@ -69,7 +75,7 @@ const pagination = reactive({
 const findChannelList = async (isLoadMore = false, isRefresh = false) => {
 	if (!isLoadMore && !isRefresh) loading.value = true;
 
-	const res = await FindChannels(pagination).catch((err) => {
+	const res = await FindChannels(pagination, remoteIndex.value).catch((err) => {
 		console.error('通道列表加载失败:', err);
 		return { items: [], total: 0 };
 	});
