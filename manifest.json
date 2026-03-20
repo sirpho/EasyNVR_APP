@@ -44,18 +44,16 @@
                     "<uses-feature android:name=\"android.hardware.camera\"/>",
                     "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
                 ],
-                "usesFeatures": [
-                    "android.hardware.wifi"
-                ]
+                "usesFeatures" : [ "android.hardware.wifi" ]
             },
             "ios" : {
                 "dSYMs" : false,
                 "idfa" : false,
-				 "plist": {
-				        "NSLocationWhenInUseUsageDescription": "需要获取定位权限以获取WiFi名称",
-				        "NSLocationAlwaysAndWhenInUseUsageDescription": "需要获取定位权限以获取WiFi名称",
-				        "NSLocationUsageDescription": "需要获取定位权限以获取WiFi名称"
-				      }
+                "plist" : {
+                    "NSLocationWhenInUseUsageDescription" : "需要获取定位权限以获取WiFi名称",
+                    "NSLocationAlwaysAndWhenInUseUsageDescription" : "需要获取定位权限以获取WiFi名称",
+                    "NSLocationUsageDescription" : "需要获取定位权限以获取WiFi名称"
+                }
             },
             "sdkConfigs" : {},
             "icons" : {
