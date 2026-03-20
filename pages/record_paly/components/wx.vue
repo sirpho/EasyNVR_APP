@@ -21,7 +21,7 @@ const finalPlaybackUrl = computed(() => {
 
 	return `${DEFAULT_PLAYBACK_URL}?channelId=${data.channelId}&deviceId=${
 		data.deviceId
-	}&token=${GetToken()}&baseUrl=${GetRemoteUrl(data.remoteIndex)}`;
+	}&token=${GetToken(data.remoteIndex)}&baseUrl=${GetRemoteUrl(data.remoteIndex)}`;
 });
 
 onLoad((options) => {

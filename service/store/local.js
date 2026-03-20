@@ -143,11 +143,11 @@ export const ClearUserInfo = () => {
  * @returns {string} 远程 url 地址
  */
 export const GetRemoteUrl = (index) => {
-	const globalState = useGlobal()
+	const wifiName = GetWifiName()
 
 	const option = (GetLoginInfo() || [])[index] || {}
 	let field = "url";
-	if(globalState.wifiName && option.wifiNames && option.wifiNames.includes(globalState.wifiName)) {
+	if(wifiName && option.wifiNames && option.wifiNames.includes(wifiName)) {
 		field = "wifiUrl"
 	}
 	return option[field] || '';
@@ -170,4 +170,20 @@ export const SetLoginInfo = (data) => {
  */
 export const GetLoginInfo = () => {
 	return getLocalStorage('loginInfo') || [];
+}
+
+
+/**
+ * @description 获取wifi名称
+ */
+export const GetWifiName = () => {
+	return getLocalStorage('wifiName') || "";
+}
+
+
+/**
+ * @description 保存wifi名称
+ */
+export const SetWifiName = (wifiName) => {
+	return setLocalStorage('wifiName', wifiName || '');
 }

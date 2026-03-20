@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { defineProps, reactive, ref, watch } from 'vue';
+import { defineProps, ref, watch, onMounted, onUnmounted } from 'vue';
 import { GetChannelSnapshot } from '@/service/http/channel.js';
 import { SplicBase64String } from '@/service/utils/string.js';
 import { GetRemoteUrl } from '@/service/store/local';
@@ -22,6 +22,8 @@ const props = defineProps({
 	},
 });
 
+let timer = ref(null);
+
 const imageData = ref(`${GetRemoteUrl(props.remoteIndex)}/cloud/assets/img/noImg.png`);
 
 const getSnapshotForChannel = () => {
@@ -31,6 +33,19 @@ const getSnapshotForChannel = () => {
 		}
 	});
 };
+
+onMounted(() => {
+  timer.value = setInterval(() => {
+    getSnapshotForChannel()
+  }, 60 * 1000)
+})
+
+onUnmounted(() => {
+  if (timer.value) {
+    clearInterval(timer.value);
+    timer.value = null;
+  }
+})
 
 // 监听 deviceId 变化，并在有值时调用 getSnapshot
 watch(

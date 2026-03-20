@@ -63,13 +63,14 @@
 	import FocusInput from '@/components/ui/input_focuse.vue';
 	import { onShareAppMessage } from '@dcloudio/uni-app';
 	import { Login } from '@/service/http/login.js';
-	import {
-		GetToken,
-		SetToken,
-		SetUserInfo,
-		SetLoginInfo,
-		GetLoginInfo,
-	} from '../../service/store/local';
+  import {
+    GetToken,
+    SetToken,
+    SetUserInfo,
+    SetLoginInfo,
+    GetLoginInfo, SetWifiName,
+  } from '../../service/store/local';
+  import {getWifiName, isWifiNetwork} from "../../service/http/wifi";
 
 	const formList = ref([{
 		domain: '',
@@ -81,11 +82,12 @@
 	// 当前激活的表单索引
 	const currentFormIndex = ref(0);
 	const loading = ref(false);
-
+  
 	// 页面挂载时初始化表单数据
 	onMounted(() => {
+    handleWifi()
 		// 原有token判断逻辑
-		if (GetToken()) {
+		if (GetToken(0)) {
 			uni.switchTab({
 				url: '/pages/index/view'
 			});
@@ -96,6 +98,7 @@
     if(data.length > 0) {
       formList.value = data
     }
+    
 	});
 
 	// swiper滑动切换事件
@@ -155,6 +158,16 @@
      })
     })
   }
+  
+  const handleWifi = async () => {
+    const isWifi = await isWifiNetwork()
+    if(isWifi) {
+      const wifiName = await getWifiName()
+      SetWifiName(wifiName)
+    } else {
+      SetWifiName('')
+    }
+  }
 
 	// 登录方法（接收表单索引）
 	const login = async () => {
@@ -198,7 +211,6 @@
 		SetLoginInfo(result);
     
     const res = await Promise.all(result.map((item, index) => loginSingle(item, index))).catch((err) => {
-      console.log(err)
       let msg = err.msg || err.errMsg || '登录失败，请检查您的服务地址是否正确';
       uni.showToast({
         title: msg,

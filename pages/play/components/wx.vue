@@ -19,7 +19,7 @@ const props = defineProps({
 const finalPlaybackUrl = computed(() => {
 	return `${DEFAULT_LIVE_PLAY_URL}?live_url=${props.url}&channelId=${
 		props.channelId
-	}&deviceId=${props.deviceId}&token=${GetToken()}&baseUrl=${GetRemoteUrl(props.remoteIndex)}`;
+	}&deviceId=${props.deviceId}&token=${GetToken(props.remoteIndex)}&baseUrl=${GetRemoteUrl(props.remoteIndex)}`;
 });
 
 watch(
