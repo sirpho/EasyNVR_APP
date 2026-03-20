@@ -225,6 +225,9 @@
       ...item.user,
       url: result[index]?.url,
       remoteIndex: result[index]?.remoteIndex,
+      wifiUrl: result[index]?.wifiUrl,
+      wifiNames: result[index]?.wifiNames,
+      wifiDomain: result[index]?.wifiDomain,
     })));
     uni.switchTab({
       url: '/pages/index/view'
