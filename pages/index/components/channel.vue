@@ -1,16 +1,5 @@
 <template>
   <view class="rounded-lg bg-white overflow-hidden" @tap="handleClick">
-    <view style="aspect-ratio: 16 / 9; position: relative">
-      <Snapshot :id="item.id" :remoteIndex="item.remoteIndex" :is-device="false" />
-      <!-- loading 效果层 -->
-      <view
-        v-if="loading"
-        class="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-70"
-      >
-        <text class="text-base text-black">加载中...</text>
-      </view>
-    </view>
-    
     <view class="p-3 flex justify-between items-center">
       <text class="font-semibold w-18 truncate">
         {{ item.deviceName || item.name || item.id }}
@@ -20,13 +9,23 @@
       </text>
       <text v-else class="text-red-600 font-semibold">离线</text>
     </view>
+    <view style="aspect-ratio: 16 / 9; position: relative" class="rounded-b-lg overflow-hidden">
+      <Snapshot :id="item.id" :remoteIndex="item.remoteIndex" :is-device="false"/>
+      <!-- loading 效果层 -->
+      <view
+        v-if="loading"
+        class="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-70"
+      >
+        <text class="text-base text-black">加载中...</text>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup>
-import { defineProps, ref } from 'vue';
+import {defineProps, ref} from 'vue';
 import Snapshot from '@/components/snapshot/snapshot.vue';
-import { Live } from '@/service/http/channel.js';
+import {Live} from '@/service/http/channel.js';
 
 const props = defineProps({
   item: {

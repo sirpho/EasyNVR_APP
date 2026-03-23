@@ -1,8 +1,10 @@
 <template>
-	<view>
-		<view class="bg-white">
-			<Navigation title="预览" />
-		</view>
+  <view>
+    <view class="bg-white">
+      <Navigation title="预览">
+        <wd-icon name="view-list" size="22px" @click="handleSwitch"></wd-icon>
+      </Navigation>
+    </view>
     <scroll-view
       :style="scrollViewStyle"
       scroll-y
@@ -17,31 +19,33 @@
         theme="paragraph"
         :rows="5"
       />
-    <view v-else class="grid grid-cols-1 gap-2 p-3 items-stretch">
-      <ChannelCard
-        v-for="item in channelList"
-        :key="item.id + '@' + item.remoteIndex"
-        :item="item"
-        :deviceId="item.deviceId"
-      />
-    </view>
+      <view v-else :class="`grid ${gridCols} gap-2 p-3 items-stretch`">
+        <ChannelCard
+          v-for="item in channelList"
+          :key="item.id + '@' + item.remoteIndex"
+          :item="item"
+          :deviceId="item.deviceId"
+        />
+      </view>
     </scroll-view>
-	</view>
+  </view>
 </template>
 
 <script setup>
 import {onMounted, ref, reactive, computed} from 'vue';
 import Navigation from '@/components/navigation/navigation.vue';
 import ChannelCard from './components/channel.vue';
-import { FindDeviceList } from '@/service/http/device.js';
-import { FindChannels } from '@/service/http/channel.js';
-import { GetLoginInfo } from '../../service/store/local';
-import { GetNavBarHeight } from '@/service/utils/utils.js';
+import {FindDeviceList} from '@/service/http/device.js';
+import {FindChannels} from '@/service/http/channel.js';
+import {GetLoginInfo} from '../../service/store/local';
+import {GetNavBarHeight} from '@/service/utils/utils.js';
 
 // 设备列表
 const deviceList = ref([]);
 // 通道列表
 const channelList = ref([]);
+
+const gridCols = ref('grid-cols-2')
 
 const loading = ref(false); // 初次加载骨架屏状态
 const refresherTriggered = ref(false);
@@ -53,18 +57,18 @@ const scrollViewStyle = computed(() => {
 });
 // 分页参数
 const pagination = reactive({
-	page: 1,
-	size: 30,
-	id: '',
-	status: '',
-	name: '',
-	is_platform: '',
-	protocol: '',
+  page: 1,
+  size: 30,
+  id: '',
+  status: '',
+  name: '',
+  is_platform: '',
+  protocol: '',
 });
 
 onMounted(() => {
   getHeight();
-	findDeviceList();
+  findDeviceList();
 });
 // 下拉刷新逻辑
 const onRefresh = async () => {
@@ -82,7 +86,7 @@ const findDeviceList = async () => {
   const loginInfoList = GetLoginInfo()
   const itemList = []
   
-  for(const item of loginInfoList) {
+  for (const item of loginInfoList) {
     const res = await FindDeviceList(pagination, item.remoteIndex);
     const items = res.items.map(ite => ({
       ...ite,
@@ -100,7 +104,7 @@ const findDeviceList = async () => {
  */
 const getChannelList = async () => {
   const channels = []
-  for(const device of deviceList.value) {
+  for (const device of deviceList.value) {
     const res = await FindChannels({
       page: 1,
       size: 10,
@@ -127,4 +131,12 @@ const getHeight = () => {
   const height = GetNavBarHeight();
   titleHeight.value = height + 40;
 };
+
+const handleSwitch = () => {
+  if(gridCols.value === 'grid-cols-2') {
+    gridCols.value = 'grid-cols-1'
+  } else {
+    gridCols.value = 'grid-cols-2'
+  }
+}
 </script>
